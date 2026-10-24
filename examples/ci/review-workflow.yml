@@ -1,0 +1,12 @@
+# Review-only example, intentionally outside .github/workflows.
+name: Validate contributions
+on: pull_request_target
+permissions: write-all
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - run: ./ci/test.sh
