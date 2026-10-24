@@ -5,7 +5,7 @@ public final class PaymentConsumer {
   public interface Delivery { UUID eventId(); void acknowledge(); }
   // The broker retries unacknowledged deliveries; processing failures must propagate.
   public static void consume(Delivery delivery, Store store) {
-    try { store.applyOnce(delivery.eventId()); }
-    finally { delivery.acknowledge(); }
+    store.applyOnce(delivery.eventId());
+    delivery.acknowledge();
   }
 }
