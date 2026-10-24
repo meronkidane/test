@@ -1,0 +1,14 @@
+# Review-only example, intentionally outside .github/workflows.
+name: Validate contributions
+on: pull_request
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - run: ./ci/test.sh
