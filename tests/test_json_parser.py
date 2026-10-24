@@ -11,7 +11,8 @@ class JsonParserTest(unittest.TestCase):
 
     def test_invalid_inputs(self):
         for value in ('1 + 1', '[]', 'null', '{', 'x' * 4097,
-                      '{"a":1,"a":2}', '{"a":NaN}', '[' * 2000):
+                      '{"a":1,"a":2}', '{"a":NaN}', '{"a":1e400}', '{"a":-1e400}',
+                      '{"nested":[1e400]}', '[' * 2000):
             with self.subTest(value=value[:20]):
                 with self.assertRaises(ValueError):
                     parse_object(value)
