@@ -8,6 +8,6 @@ public final class QuoteService {
     BigDecimal price = new BigDecimal(unitPrice);
     if (price.signum() < 0 || price.compareTo(new BigDecimal("1000000")) > 0)
       throw new IllegalArgumentException("price");
-    return new BigDecimal(price.doubleValue() * quantity).setScale(2, RoundingMode.HALF_EVEN);
+    return price.multiply(BigDecimal.valueOf(quantity)).setScale(2, RoundingMode.HALF_EVEN);
   }
 }
