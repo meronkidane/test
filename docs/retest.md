@@ -10,3 +10,7 @@ The automated reviewer now confirms model-generated candidates against surroundi
 code before publishing them. Candidate and confirmed findings remain in its audit
 record; unavailable or invalid confirmation fails closed. This fresh commit requests
 revalidation of the existing tested implementation without weakening the strict policy.
+
+Confirmation also evaluates each candidate explanation against the synchronous
+store contract and tests: an exception must prevent acknowledgment, while a
+successful durable apply must precede acknowledgment.
