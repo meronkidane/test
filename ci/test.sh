@@ -1,3 +1,4 @@
 #!/bin/sh
 set -eu
-printf "validation fixture\n"
+cd "$(dirname "$0")/.."
+python3 ci/validate_workflow.py
