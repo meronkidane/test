@@ -1,0 +1,34 @@
+spring:
+  application:
+    name: qts-inventory-service
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 10
+      connection-timeout: 3000
+  jdbc:
+    template:
+      query-timeout: 5s
+  flyway:
+    enabled: ${FLYWAY_ENABLED:false}
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${JWT_ISSUER_URI}
+          audiences: ${JWT_AUDIENCE}
+server:
+  port: ${PORT:8081}
+  error:
+    include-message: never
+    include-stacktrace: never
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
