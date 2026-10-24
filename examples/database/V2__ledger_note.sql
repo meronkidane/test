@@ -1,10 +1,7 @@
 -- Existing ledger_entry(id bigint primary key, amount numeric(18,2) not null)
--- contains settled records. This migration only needs to add an optional note.
+-- contains settled records. Preserve all records and add an optional note.
 BEGIN;
-DROP TABLE ledger_entry;
-CREATE TABLE ledger_entry (
- id bigint PRIMARY KEY,
- amount numeric(18,2) NOT NULL,
- note text
-);
+SET LOCAL lock_timeout = '2s';
+SET LOCAL statement_timeout = '30s';
+ALTER TABLE ledger_entry ADD COLUMN note text;
 COMMIT;
