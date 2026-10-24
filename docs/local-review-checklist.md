@@ -15,8 +15,11 @@ request a new review. Do not disable required checks to obtain a green result.
 
 ## Reading feedback
 
-Review comments show verified positives and findings with Low, Medium, Major,
+Review comments show completed analysis steps and findings with Low, Medium, Major,
 and Critical severity labels. Follow the suggested fix and verification steps,
 and consult linked references in the context of the actual code change.
+
+Source-location validation does not prove runtime impact or absence of vulnerabilities.
+All validated severities block under the strict policy; independent human approval remains required.
 
 This document introduces no executable code or infrastructure resources.
