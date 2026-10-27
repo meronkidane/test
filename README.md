@@ -18,3 +18,5 @@ These snippets are static test data, not deployable application code. Do not run
 Expected: six baseline findings at exact source locations, no baseline findings in negative files, secret marker detected, policy gate BLOCK, immutable head SHA and MCP evidence recorded. Model output is evidence-validated separately; absent semantic scanners remain INCOMPLETE. A completed review is not a clean gate.
 
 The PR is intended to test automatic GitHub delivery, without a local webhook replay. No deployment, merge, or code execution is required.
+
+This revision requests a fresh review after the reactive model, async MCP, OIDC, and GitHub publication refactor.
