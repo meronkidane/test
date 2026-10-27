@@ -20,3 +20,5 @@ Expected: six baseline findings at exact source locations, no baseline findings 
 The PR is intended to test automatic GitHub delivery, without a local webhook replay. No deployment, merge, or code execution is required.
 
 This revision requests a fresh review after the reactive model, async MCP, OIDC, and GitHub publication refactor.
+
+Run the final structured-streaming reviewer and publish severity/status statistics, positive observations, and live UI results for this commit.
