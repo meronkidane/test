@@ -1,0 +1,8 @@
+{
+  "apiBase": "/api",
+  "oidc": {
+    "url": "http://localhost:8097",
+    "realm": "review",
+    "clientId": "service-desk-ui"
+  }
+}

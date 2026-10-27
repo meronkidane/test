@@ -1,0 +1,31 @@
+<a class="skip" href="#queue">Skip to request queue</a>
+<header><a class="wordmark" href="/">f<span>↗</span> fieldwork</a><div class="identity">{{tenant}} workspace <span class="dot">·</span> {{user}} <button class="quiet" (click)="logout()">Sign out</button></div></header>
+<main>
+ <section class="intro"><div><p class="eyebrow">OPERATIONS / SERVICE DESK</p><h1>Good work starts<br>with a clear request.</h1></div><p class="intro-note">One shared queue.<br>Every request has a next step.</p></section>
+ <div role="alert" class="error" [hidden]="!error()">{{error()}}</div><p role="status" class="notice">{{busy() ? 'Working…' : notice()}}</p>
+ <div class="workspace">
+  <section id="queue" aria-labelledby="queue-title" [attr.aria-busy]="busy()">
+   <div class="section-top"><h2 id="queue-title">Team queue <span class="count">{{result().items.length}}</span></h2><button class="quiet" [disabled]="busy()" (click)="load(result().page)">Refresh queue</button></div>
+   <nav class="filters" aria-label="Filter by status">@for (s of ['', 'OPEN','IN_PROGRESS','RESOLVED']; track s) {<button [attr.aria-pressed]="filter()===s" [disabled]="busy()" (click)="load(0,s)">{{s===''?'All requests':s==='OPEN'?'Open':s==='IN_PROGRESS'?'In progress':'Resolved'}}</button>}</nav>
+   <div class="requests">@for(item of result().items; track item.id) {
+    <button class="request" [class.active]="selected()?.id===item.id" [disabled]="busy()" (click)="selected.set(item)">
+     <span class="request-top"><span class="status" [class.resolved]="item.status==='RESOLVED'">{{label(item.status)}}</span><span class="priority" [class.high]="item.priority==='HIGH'">{{item.priority}}</span></span>
+     <strong>{{item.title}}</strong><span class="request-bottom"><span>{{item.createdAt | date:'MMM d, h:mm a'}}</span><span>View request ↗</span></span>
+    </button>
+   } @empty {<div class="empty"><span>↗</span><h3>A little room to breathe.</h3><p>No requests in this view. Create one or choose another status.</p></div>}</div>
+   <div class="pagination"><button class="quiet" [disabled]="busy()||result().page===0" (click)="load(result().page-1)">← Previous</button><span>Page {{result().page+1}}</span><button class="quiet" [disabled]="busy()||!result().hasNext" (click)="load(result().page+1)">Next →</button></div>
+   @if(selected(); as item) {<article class="detail" aria-labelledby="detail-title"><p class="eyebrow">REQUEST DETAILS · REVISION {{item.version}}</p><h2 id="detail-title">{{item.title}}</h2><p class="description">{{item.description}}</p><p class="muted">Updated {{item.updatedAt | date:'medium'}}</p>@if(canManage){<button class="primary" [disabled]="busy()" (click)="advance(item)">{{item.status==='OPEN'?'Start work':item.status==='IN_PROGRESS'?'Mark resolved':'Reopen request'}} →</button>}@else{<p class="muted">A team lead can update this request's status.</p>}</article>}
+  </section>
+  <aside><p class="eyebrow">GET SOMETHING MOVING</p><h2>New request</h2><p class="muted">Tell your team what you need and why it matters.</p>
+   <form [formGroup]="form" (ngSubmit)="create()">
+    <label for="title">What do you need?</label><input id="title" name="title" formControlName="title" required maxlength="160" placeholder="e.g. Restore access to the VPN" [attr.aria-invalid]="form.controls.title.touched&&form.controls.title.invalid" aria-describedby="title-error">
+    <small id="title-error">@if(form.controls.title.touched&&form.controls.title.invalid){Enter a title, up to 160 characters.}</small>
+    <label for="description">A little more context</label><textarea id="description" name="description" formControlName="description" required maxlength="4000" rows="5" placeholder="What happened? What should happen instead?" [attr.aria-invalid]="form.controls.description.touched&&form.controls.description.invalid" aria-describedby="description-error"></textarea>
+    <small id="description-error">@if(form.controls.description.touched&&form.controls.description.invalid){Add details, up to 4,000 characters.}</small>
+    <fieldset><legend>Priority</legend><div class="priorities">@for(p of ['LOW','NORMAL','HIGH'];track p){<label><input type="radio" name="priority" formControlName="priority" [value]="p">{{p==='LOW'?'Low':p==='NORMAL'?'Normal':'High'}}</label>}</div></fieldset>
+    <button class="primary submit" type="submit" [disabled]="busy()">Create request <span>↗</span></button>
+   </form><p class="form-foot">Visible to your {{tenant}} workspace.<br>Only team leads can change request status.</p>
+  </aside>
+ </div>
+ <footer>FIELDWORK <span>Small requests. Forward motion.</span></footer>
+</main>
