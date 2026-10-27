@@ -1,0 +1,50 @@
+[
+  {
+    "path": ".github/workflows/review-fixture-positive.yml",
+    "expectedTextFinding": true
+  },
+  {
+    "path": "Security.java",
+    "expectedTextFinding": true
+  },
+  {
+    "path": "scenarios/positive/component.ts",
+    "expectedTextFinding": true
+  },
+  {
+    "path": "scenarios/positive/migration.sql",
+    "expectedTextFinding": true
+  },
+  {
+    "path": "scenarios/positive/pipeline.py",
+    "expectedTextFinding": true
+  },
+  {
+    "path": "scenarios/positive/policy.tf",
+    "expectedTextFinding": true
+  },
+  {
+    "path": ".github/workflows/review-fixture-negative.yml",
+    "expectedTextFinding": false
+  },
+  {
+    "path": "scenarios/negative/Security.java",
+    "expectedTextFinding": false
+  },
+  {
+    "path": "scenarios/negative/component.ts",
+    "expectedTextFinding": false
+  },
+  {
+    "path": "scenarios/negative/migration.sql",
+    "expectedTextFinding": false
+  },
+  {
+    "path": "scenarios/negative/pipeline.py",
+    "expectedTextFinding": false
+  },
+  {
+    "path": "scenarios/negative/policy.tf",
+    "expectedTextFinding": false
+  }
+]

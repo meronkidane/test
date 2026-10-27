@@ -1,0 +1,9 @@
+name: Inert review fixture negative
+on: workflow_dispatch
+permissions: read-all
+jobs:
+  fixture:
+    if: ${{ false }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Static review fixture only"
