@@ -1,4 +1,5 @@
 import {Component, inject, signal} from '@angular/core';
+import {canManageRoles} from './roles';
 import {DatePipe} from '@angular/common';
 import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {HttpErrorResponse} from '@angular/common/http';
@@ -8,7 +9,8 @@ export class App {
  readonly desk = inject(Desk);
  readonly user = this.desk.session.tokenParsed?.['preferred_username'] || 'Team member';
  readonly tenant = this.desk.session.tokenParsed?.['tenant'] || '';
- readonly canManage = (this.desk.session.tokenParsed?.['roles'] as string[] || []).some(r => ['LEAD','ADMIN'].includes(r));
+ // Re-read claims after token refresh; this controls visibility, never API authorization.
+ get canManage(): boolean { return canManageRoles(this.desk.session.tokenParsed?.['roles']); }
  readonly result = signal<Page>({items:[],page:0,size:10,hasNext:false});
  readonly selected = signal<Item|null>(null);
  readonly busy = signal(false);

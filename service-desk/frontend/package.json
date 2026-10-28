@@ -5,7 +5,8 @@
   "scripts": {
     "start": "ng serve --host 127.0.0.1",
     "build": "ng build",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "test": "node --experimental-strip-types --test tests/*.test.mjs"
   },
   "dependencies": {
     "@angular/common": "21.2.25",

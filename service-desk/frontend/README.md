@@ -27,3 +27,10 @@ Build tooling uses Angular CLI/build 21.2.28 with a scoped Undici 7.30.1 patch o
 
 The review's proposed separate COPY instructions and removal of EXPOSE would not
 fix security defects, so those behavior changes were not made.
+
+Token roles are runtime-validated as an array of strings before management controls
+are displayed; malformed or missing claims disable those controls. The hint is
+recomputed after token refresh. Run `npm test` for malformed-claim regressions.
+This is presentation logic: the companion backend validates JWT signature, issuer
+and audience and enforces LEAD/ADMIN using `@PreAuthorize` on status transitions.
+Backend denial tests exercise direct API requests, bypassing the frontend.
