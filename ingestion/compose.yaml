@@ -1,0 +1,80 @@
+name: spark-ingestion-demo
+x-runtime: &runtime
+  DATABASE_URL: postgresql://ingestion:${DB_PASSWORD:?run scripts/configure.py}@postgres:5432/ingestion
+  DEMO_API_TOKEN: ${DEMO_API_TOKEN:?run scripts/configure.py}
+  OTHER_API_TOKEN: ${OTHER_API_TOKEN:?run scripts/configure.py}
+  SOURCE_USER: ingestion_reader
+  SOURCE_PASSWORD: local-source-only
+  CATALOG_PATH: /app/config/catalog.json
+  AWS_ACCESS_KEY_ID: test
+  AWS_SECRET_ACCESS_KEY: test
+  AWS_REGION: us-east-1
+  AWS_DEFAULT_REGION: us-east-1
+  S3_ENDPOINT: http://localstack:4566
+services:
+  postgres:
+    image: postgres:17.4-alpine
+    environment:
+      POSTGRES_USER: ingestion
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?run scripts/configure.py}
+      POSTGRES_DB: ingestion
+    ports: ["127.0.0.1:55439:5432"]
+    volumes:
+      - state:/var/lib/postgresql/data
+      - ./fixtures/source.sql:/docker-entrypoint-initdb.d/001-source.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ingestion -d ingestion"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+  localstack:
+    image: localstack/localstack:4.3.0
+    environment: {SERVICES: s3, AWS_DEFAULT_REGION: us-east-1}
+    ports: ["127.0.0.1:4569:4566"]
+    healthcheck:
+      test: ["CMD", "awslocal", "s3api", "list-buckets"]
+      interval: 3s
+      timeout: 5s
+      retries: 30
+  seed:
+    image: spark-ingestion-demo-worker
+    build: {context: ., target: worker}
+    environment: *runtime
+    command: ["python", "-m", "scripts.seed"]
+    depends_on:
+      localstack: {condition: service_healthy}
+  api:
+    build: {context: ., target: api}
+    environment:
+      DATABASE_URL: postgresql://ingestion:${DB_PASSWORD:?run scripts/configure.py}@postgres:5432/ingestion
+      DEMO_API_TOKEN: ${DEMO_API_TOKEN:?run scripts/configure.py}
+      OTHER_API_TOKEN: ${OTHER_API_TOKEN:?run scripts/configure.py}
+      CATALOG_PATH: /app/config/catalog.json
+    ports: ["127.0.0.1:8099:8080"]
+    depends_on:
+      postgres: {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health')"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    init: true
+    read_only: true
+    tmpfs: ["/tmp:size=64m,mode=1777"]
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: [ALL]
+  worker:
+    build: {context: ., target: worker}
+    environment: *runtime
+    depends_on:
+      api: {condition: service_healthy}
+      seed: {condition: service_completed_successfully}
+    init: true
+    mem_limit: 3g
+    cpus: 2
+    pids_limit: 512
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: [ALL]
+    stop_grace_period: 20s
+volumes:
+  state:

@@ -1,0 +1,5 @@
+services:
+  api:
+    volumes: ["./app:/app/app:ro"]
+  worker:
+    volumes: ["./app:/app/app:ro", "./scripts:/app/scripts:ro"]

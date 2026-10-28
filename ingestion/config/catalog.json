@@ -1,0 +1,44 @@
+{
+  "principals": {
+    "demo": {
+      "token_env": "DEMO_API_TOKEN",
+      "datasets": [
+        "orders"
+      ]
+    },
+    "other": {
+      "token_env": "OTHER_API_TOKEN",
+      "datasets": [
+        "orders"
+      ]
+    }
+  },
+  "datasets": {
+    "orders": {
+      "output": "s3a://curated/orders",
+      "max_invalid_fraction": 0.2,
+      "output_partitions": 2,
+      "sources": {
+        "postgres": {
+          "kind": "jdbc",
+          "uri": "jdbc:postgresql://postgres:5432/ingestion",
+          "table": "source_orders",
+          "user_env": "SOURCE_USER",
+          "password_env": "SOURCE_PASSWORD"
+        },
+        "csv": {
+          "kind": "csv",
+          "uri": "s3a://landing/csv/"
+        },
+        "json": {
+          "kind": "json",
+          "uri": "s3a://landing/json/"
+        },
+        "parquet": {
+          "kind": "parquet",
+          "uri": "s3a://landing/parquet/"
+        }
+      }
+    }
+  }
+}

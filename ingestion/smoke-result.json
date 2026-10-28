@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "run_id": "3186f21a-f442-43be-974d-ef26408a6336",
+  "input_rows": 11,
+  "output_rows": 8,
+  "sources": [
+    "csv",
+    "json",
+    "parquet",
+    "postgres"
+  ],
+  "manifest_uri": "s3a://curated/orders/demo/orders/runs/3186f21a-f442-43be-974d-ef26408a6336/attempts/8843a853-86b8-4e09-b380-d93ccf9b4894/manifest.json",
+  "idempotency": "PASS",
+  "cancel": "PASS"
+}
