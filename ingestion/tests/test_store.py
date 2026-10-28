@@ -70,3 +70,15 @@ def test_successful_retry_clears_previous_error(store):
     retry = store.claim()
     assert store.complete(retry["id"], retry["claim"], {"manifest": "accepted"})
     assert store.get("demo", retry["id"])["error_code"] is None
+
+
+def test_shared_worker_claims_tenants_without_exposing_their_jobs(store):
+    first, _ = store.submit("demo", "shared-worker", {"dataset": "orders"})
+    second, _ = store.submit("other", "shared-worker", {"dataset": "orders"})
+    claims = [store.claim(), store.claim()]
+    assert {claim["tenant"] for claim in claims} == {"demo", "other"}
+    assert {claim["id"] for claim in claims} == {first["id"], second["id"]}
+    assert store.get("other", first["id"]) is None
+    assert store.get("demo", second["id"]) is None
+    assert not store.cancel("other", first["id"])
+    assert not store.cancel("demo", second["id"])

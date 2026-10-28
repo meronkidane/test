@@ -21,7 +21,10 @@ flowchart LR
 ## Run locally
 
 Requires Docker Compose with at least 4 GB RAM and several GB free Docker disk.
-Ports 8099, 55439 and 4569 are bound to loopback. Run from this directory:
+Ports 8099, 55439 and 4569 are bound to loopback. Set `POSTGRES_HOST_PORT` in
+`.env` to change the PostgreSQL host port if it conflicts with another local service.
+The host binding supports local database tests and debugging; containers use
+`postgres:5432` regardless of this setting. Run from this directory:
 
 ```sh
 python3 scripts/configure.py  # creates .env once, mode 0600; never commit it
@@ -64,6 +67,11 @@ tmpfs explicitly permits that; no repository-supplied code is executed.
 - **Worker (`app/worker.py`)** claims one job at a time per replica, renews a lease,
   launches a separate Spark process, enforces a wall-clock deadline, and records
   success only when its claim is still live. Add replicas to increase concurrency.
+  Workers are trusted platform services that process all tenants, not tenant-owned
+  processes. Queue claims intentionally span tenants; API reads and cancellation
+  remain tenant-scoped, and output prefixes include the job tenant. Do not give
+  tenants worker database credentials. Dedicated tenant workers require a separate
+  deployment and authorization design.
 - **Spark task (`app/spark_job.py`, `app/pipeline.py`)** uses Spark DataFrame readers,
   JDBC fetch sizing, fixed schemas, distributed transformations and Parquet writers.
   It never collects the dataset to the Python driver. Local Compose uses `local[2]`;

@@ -18,6 +18,8 @@ def create_app(store=None, catalog=None):
     store = store or Store(os.environ["DATABASE_URL"])
     catalog = catalog or Catalog.load(os.environ.get("CATALOG_PATH", "config/catalog.json"))
     # Resolve credentials once; fail startup if any configured token is missing/weak.
+    if any(not os.environ.get(p.token_env) for p in catalog.principals.values()):
+        raise ValueError("Every configured tenant requires a non-empty API token environment variable")
     tokens = {tenant: os.environ[p.token_env] for tenant, p in catalog.principals.items()}
     if any(len(token) < 24 for token in tokens.values()) or len(set(tokens.values())) != len(tokens):
         raise ValueError("Use distinct API tokens of at least 24 characters")
