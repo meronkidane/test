@@ -1,3 +1,13 @@
+# CI maintenance — 2026-10-28
+
+GitHub run 40718009008 passed all tests, image builds and the end-to-end smoke.
+Its warnings identified deprecated Node 20 actions and a moving ubuntu-latest
+image. The workflow now pins the Node 24-based v6 actions to commit SHAs, uses
+ubuntu-24.04 explicitly, and bounds the job to 30 minutes. New CI verifies these
+workflow-only changes. The separate AI review reports no code defects but remains
+incomplete because its changed-file context budget omitted files; that reviewer
+limitation is not an ingestion test failure.
+
 # PR review follow-up — 2026-10-28
 
 - Removed the committed source-reader password. Local setup now generates a distinct
