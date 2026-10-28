@@ -32,7 +32,9 @@ docker compose run --rm --no-deps -e API_URL=http://api:8080 worker python -m sc
 ```
 
 The seed service creates CSV/JSON/Parquet input objects. PostgreSQL initialization
-creates two source rows and a SELECT-only source login. The smoke test submits one
+creates two source rows and a SELECT-only source login whose random password is
+generated in `.env` as SOURCE_PASSWORD. The initialization script reads it through
+psql `\getenv` and SQL-literal quoting; no source password is committed. The smoke test submits one
 four-source run, verifies idempotency, waits for completion, checks the S3 manifest
 and partitioned objects, and tests cancellation. Expected: **11 input rows, 8 output
 rows, 3 duplicates, 0 invalid rows**. Rerunning seed overwrites its known fixture
@@ -195,3 +197,12 @@ S3 Parquet writes. See `VERIFICATION.md` for executed results and limitations.
 Design references: [Spark JDBC](https://spark.apache.org/docs/4.0.1/sql-data-sources-jdbc.html),
 [Spark cloud storage semantics](https://spark.apache.org/docs/4.0.1/cloud-integration.html),
 [Hadoop S3A endpoints](https://hadoop.apache.org/docs/r3.4.1/hadoop-aws/tools/hadoop-aws/connecting.html).
+
+### Existing local environments
+
+New environments get SOURCE_PASSWORD from `scripts/configure.py`. For an existing
+`.env`, add a newly generated secret without replacing the other credentials. The
+PostgreSQL init script runs only for an empty data directory: changing `.env` does
+**not** rotate an existing database role. Rotate `ingestion_reader` through an
+administrator-controlled credential-management process and restart workers with
+the matching secret. Do not delete a persistent volume as a credential-rotation step.

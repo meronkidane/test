@@ -30,6 +30,7 @@ jobs:
         env:
           TEST_DATABASE_URL: postgresql://test:test-only@localhost:5432/ingestion_test
           SPARK_LOCAL_IP: 127.0.0.1
+          RUN_DOCKER_TESTS: "1"
       - run: python scripts/configure.py
       - run: docker compose up --build -d
       - run: docker compose run --rm --no-deps -e API_URL=http://api:8080 worker python -m scripts.smoke

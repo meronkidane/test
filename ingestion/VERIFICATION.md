@@ -1,3 +1,23 @@
+# PR review follow-up — 2026-10-28
+
+- Removed the committed source-reader password. Local setup now generates a distinct
+  random SOURCE_PASSWORD; psql reads it from the environment and quotes it as an SQL
+  literal during initialization. Compose requires the setting explicitly.
+- New PostgreSQL data directories require SCRAM for TCP authentication. Existing
+  databases require administrator-managed role/password and pg_hba.conf changes;
+  initialization flags do not silently modify existing data directories.
+- **26 tests passed, zero skips**, including a fresh disposable PostgreSQL bootstrap
+  with a password containing quotes/backslashes, rejection of an incorrect password,
+  SELECT-only permissions, and rejection of weak/reused API tokens and invalid
+  idempotency keys. Worker cancellation/deadline and fencing tests remain passing.
+- Rotated the local existing source-reader credential without deleting data, restarted
+  the worker and reran the container smoke: **PASS**, 11 input rows, 8 output rows,
+  all four sources, S3 Parquet readback, idempotency and cancellation verified.
+- The initial PR's GitHub CI run 40716752958 completed successfully, including full
+  Docker builds and container smoke. The follow-up commit triggers a new CI run.
+- The remaining three review findings explicitly describe positive controls with
+  "No change needed"; those controls are retained and covered by tests.
+
 # Executed verification — 2026-10-28
 
 - Python 3.12 / Java 21 host tests: **18 passed, zero skipped**. This includes

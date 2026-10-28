@@ -4,7 +4,7 @@ x-runtime: &runtime
   DEMO_API_TOKEN: ${DEMO_API_TOKEN:?run scripts/configure.py}
   OTHER_API_TOKEN: ${OTHER_API_TOKEN:?run scripts/configure.py}
   SOURCE_USER: ingestion_reader
-  SOURCE_PASSWORD: local-source-only
+  SOURCE_PASSWORD: ${SOURCE_PASSWORD:?run scripts/configure.py}
   CATALOG_PATH: /app/config/catalog.json
   AWS_ACCESS_KEY_ID: test
   AWS_SECRET_ACCESS_KEY: test
@@ -18,6 +18,8 @@ services:
       POSTGRES_USER: ingestion
       POSTGRES_PASSWORD: ${DB_PASSWORD:?run scripts/configure.py}
       POSTGRES_DB: ingestion
+      POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256
+      SOURCE_PASSWORD: ${SOURCE_PASSWORD:?run scripts/configure.py}
     ports: ["127.0.0.1:55439:5432"]
     volumes:
       - state:/var/lib/postgresql/data
