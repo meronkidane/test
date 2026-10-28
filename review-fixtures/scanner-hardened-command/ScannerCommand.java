@@ -3,10 +3,14 @@ import java.util.List;
 
 // Review fixture only: command construction is tested; no container is started.
 public final class ScannerCommand {
-    public static List<String> command(Path checkout) throws java.io.IOException {
+    public static List<String> command(Path checkoutRoot, Path checkout) throws java.io.IOException {
+        // checkoutRoot is trusted service configuration, never supplied by repository content.
+        Path root = checkoutRoot.toRealPath();
         Path source = checkout.toRealPath();
-        if (!java.nio.file.Files.isDirectory(source) || source.toString().contains(",")) {
-            throw new IllegalArgumentException("A canonical directory without commas is required");
+        if (!java.nio.file.Files.isDirectory(root) || !java.nio.file.Files.isDirectory(source)
+                || source.equals(root) || !source.startsWith(root)
+                || source.toString().chars().anyMatch(c -> c == ',' || c == '"' || c == '\r' || c == '\n')) {
+            throw new IllegalArgumentException("A checkout directory beneath the trusted root with a safe mount field is required");
         }
         return List.of("docker", "run", "--rm", "--network=none", "--read-only",
                 "--cap-drop=ALL", "--security-opt=no-new-privileges",
