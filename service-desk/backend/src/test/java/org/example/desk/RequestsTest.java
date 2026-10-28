@@ -30,6 +30,19 @@ class RequestsTest {
     .andExpect(status().isCreated()).andExpect(jsonPath("$.version").value(0)).andReturn().getResponse().getContentAsString();
   return JsonMapper.builder().build().readTree(body).path("id").asText();
  }
+ @Test void onlyGetHealthIsPublicAndDoesNotExposeDetails() throws Exception {
+  mvc.perform(get("/actuator/health")).andExpect(status().isOk())
+    .andExpect(jsonPath("$.status").value("UP"))
+    .andExpect(jsonPath("$.components").doesNotExist())
+    .andExpect(jsonPath("$.details").doesNotExist());
+  mvc.perform(post("/actuator/health")).andExpect(status().isUnauthorized());
+  mvc.perform(get("/actuator/health/private")).andExpect(status().isUnauthorized());
+  mvc.perform(get("/actuator/env")).andExpect(status().isUnauthorized());
+  mvc.perform(post("/api/requests").contentType("application/json").content("{}"))
+    .andExpect(status().isUnauthorized());
+  mvc.perform(patch("/api/requests/unknown/status").contentType("application/json").content("{}"))
+    .andExpect(status().isUnauthorized());
+ }
  @Test void authenticationAndValidation() throws Exception {
   mvc.perform(get("/api/requests")).andExpect(status().isUnauthorized());
   mvc.perform(get("/api/requests").with(jwt())).andExpect(status().isForbidden());
