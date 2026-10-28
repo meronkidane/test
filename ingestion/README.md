@@ -176,6 +176,29 @@ unrestricted driver logs. API tokens are a reference service-to-service mechanis
 use a production identity gateway/OIDC, ingress rate limits and request-size limits
 before exposing this API outside a private network.
 
+### Rotate API tokens
+
+API tokens are loaded and validated once when the API starts. Updating `.env` does
+not change a running process. To rotate a local tenant token:
+
+1. Generate a new random token, for example with Python's `secrets.token_urlsafe(32)`,
+   and securely replace the matching `DEMO_API_TOKEN` or `OTHER_API_TOKEN` value in
+   the ignored `.env` file. Keep tokens distinct and at least 24 characters long;
+   retain restrictive file permissions and never commit or log the values.
+2. From this directory, run `docker compose up -d --no-deps --force-recreate --wait api`
+   to recreate the API with the updated environment. `docker compose restart api`
+   alone does not reload changed Compose environment values.
+3. Update the affected client credential through a secure channel. Confirm an
+   authenticated request with the new token succeeds and the old token receives
+   HTTP 401; `/health` is unauthenticated and cannot verify token rotation.
+
+There is no hot reload or dual-token grace period. Coordinate client updates with
+the brief API interruption. Recreate every API replica in a replicated deployment;
+an old replica retains its old token until replaced. Workers and queued jobs do not
+need restarting for API token rotation. Production deployments should use the
+identity gateway and secret-management lifecycle described above. If authentication
+audit logging is added, record outcomes without Authorization headers or token values.
+
 ## Build, versions and verification
 
 Python 3.12, Java 17+ and Spark 4.0.1. Hadoop S3A 3.4.1 matches the bundled Hadoop
